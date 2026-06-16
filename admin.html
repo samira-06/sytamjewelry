@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Sytam Admin — Espace Privé</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css?v=20250608">
+
+</head>
+<body>
+ 
+<audio id="orderSound" preload="auto"></audio>
+ 
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div class="login-logo">SYTAM</div>
+    <div class="login-sub">Espace Administration Privé</div>
+    <input type="password" class="login-inp" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">Accéder au tableau de bord</button>
+    <div class="login-err" id="loginErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Mot de passe incorrect</div>
+    <div class="login-hint">Accès réservé — Sytam Jewelry</div>
+  </div>
+</div>
+ 
+<!-- NOTIF PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="np-header">
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M9 21h6"/></svg> Nouvelles commandes</h3>
+    <button class="np-close" onclick="toggleNotifPanel()">✕</button>
+  </div>
+  <div class="np-body" id="npBody"></div>
+</div>
+ 
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-title" id="toastTitle"></div><div id="toastBody"></div></div>
+ 
+<!-- MODAL -->
+<div class="modal-ov" id="modalOv" onclick="closeModalOut(event)"><div class="modal" id="modal"></div></div>
+ 
+<!-- ADMIN APP -->
+<div id="adminApp">
+<div class="admin-wrap">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <h1>ADMIN</h1>
+      <p>Sytam Jewelry — Privé</p>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-item active" onclick="goTab('dashboard',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Tableau de bord</div>
+      <div class="sb-item" onclick="goTab('orders',this)" id="sb-orders"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>Commandes<span class="sb-badge" id="sb-badge" style="display:none">0</span></div>
+      <div class="sb-item" onclick="goTab('custom_orders',this)" id="sb-custom"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span>Personnalisations<span class="sb-badge" id="sb-badge-custom" style="display:none">0</span></div>
+      <div class="sb-item" onclick="goTab('messages',this)" id="sb-messages"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Messages<span class="sb-badge" id="sb-badge-msgs" style="display:none">0</span></div>
+      <div class="sb-item" onclick="goTab('products',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>Produits &amp; Stock</div>
+      <div class="sb-item" onclick="goTab('loyalty',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Fidélité Clients</div>
+      <div class="sb-item" onclick="goTab('promos',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Promotions</div>
+      <div class="sb-item" onclick="goTab('analytics',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytiques</div>
+      <div class="sb-item" onclick="goTab('visitors',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>Visiteurs</div>
+      <div class="sb-item" onclick="goTab('settings',this)"><span class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Paramètres</div>
+    </nav>
+    <div class="sb-logout">
+      <a href="index.html" class="btn-back-site" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:.8rem;color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Retour au site</a>
+      <button class="logout-btn" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Déconnexion</button>
+    </div>
+  </aside>
+ 
+  <main class="content">
+    <div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- DASHBOARD -->
+    <div class="tab active" id="tab-dashboard">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <div class="hamburger" onclick="toggleSidebar()">☰</div>
+          <div><h1>Tableau de bord</h1><p id="adminDate">Bienvenue sur votre espace de gestion</p></div>
+        </div>
+        <div class="topbar-right">
+          <div class="notif-bell" onclick="toggleNotifPanel()" id="bellBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="bell-badge" id="bellBadge" style="display:none">0</span></div>
+          <div style="font-size:.8rem;color:var(--tl)" id="topDate"></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-val" id="s-revenue">—</div><div class="stat-lbl">Chiffre d'affaires</div><div class="stat-trend up" id="s-rev-trend">—</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div class="stat-val" id="s-orders">—</div><div class="stat-lbl">Commandes totales</div><div class="stat-trend" id="s-ord-trend">—</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="stat-val" id="s-products">—</div><div class="stat-lbl">Produits actifs</div><div class="stat-trend" style="color:var(--tl)">6 catégories</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-val" id="s-lowstock">—</div><div class="stat-lbl">Stocks faibles</div><div class="stat-trend dn">À réapprovisionner</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Ventes par mois <span>2025</span></div><div class="chart-bars" id="salesChart"></div></div>
+        <div class="card"><div class="card-title">Par catégorie</div><div id="catChart"></div></div>
+      </div>
+      <div class="card full">
+        <div class="card-title">Dernières commandes <span onclick="goTab('orders',document.querySelectorAll('.sb-item')[1])">Voir toutes →</span></div>
+        <div class="tbl-wrap"><table><thead><tr><th>N°</th><th>Client</th><th>Articles</th><th>Zone</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="recentOrders"></tbody></table></div>
+      </div>
+    </div>
+ 
+    <!-- ORDERS -->
+    <div class="tab" id="tab-orders">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Commandes boutique</h1><p>Toutes les commandes standard</p></div></div>
+        <div class="topbar-right">
+          <div class="notif-bell" onclick="toggleNotifPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="bell-badge" id="bellBadge2" style="display:none">0</span></div>
+          <select class="form-input" style="width:auto;padding:.5rem .8rem" id="orderFilter" onchange="renderOrdersTable()">
+            <option value="all">Toutes</option>
+            <option value="pending">En attente</option>
+            <option value="paid">Payées</option>
+            <option value="shipped">Expédiées</option>
+            <option value="cancelled">Annulées</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap"><table><thead><tr><th>N°</th><th>Client</th><th>Téléphone</th><th>Adresse</th><th>Articles</th><th>Zone</th><th>Paiement</th><th>Total</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+      </div>
+    </div>
+ 
+    <!-- CUSTOM ORDERS -->
+    <div class="tab" id="tab-custom_orders">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Commandes Personnalisées</h1><p>Chaînes et bracelets gravés à fabriquer</p></div></div>
+        <div class="topbar-right">
+          <div style="font-size:.82rem;color:var(--tl)">Délai de fabrication : 2-4 semaines</div>
+        </div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></div><div class="stat-val" id="c-total">—</div><div class="stat-lbl">Personnalisations total</div></div>
+        <div class="stat-card" style="border-color:var(--wa)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-val" id="c-pending">—</div><div class="stat-lbl">En fabrication</div></div>
+        <div class="stat-card" style="border-color:var(--ok)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-val" id="c-done">—</div><div class="stat-lbl">Livrées</div></div>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>N°</th><th>Client</th><th>Téléphone</th><th>Bijou</th><th>Gravure</th><th>Acompte</th><th>Total</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="customOrdersTable"></tbody>
+        </table></div>
+      </div>
+    </div>
+ 
+    <!-- PRODUCTS -->
+    <div class="tab" id="tab-products">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Produits &amp; Stock</h1><p>Gérez votre catalogue et inventaire</p></div></div>
+        <button class="btn-add" onclick="openAddProduct()">+ Ajouter un produit</button>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div class="stat-val" id="p-stockval">—</div><div class="stat-lbl">Valeur du stock</div></div>
+        <div class="stat-card" style="border-color:var(--wa)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-val" id="p-lowcount">—</div><div class="stat-lbl">Stock faible</div></div>
+        <div class="stat-card" style="border-color:var(--er)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="stat-val" id="p-outcount">—</div><div class="stat-lbl">Ruptures de stock</div></div>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Promo</th><th>Stock</th><th>Niveau</th><th>Vendus</th><th>Actions</th></tr></thead><tbody id="stockTable"></tbody></table></div>
+      </div>
+    </div>
+ 
+    <!-- LOYALTY -->
+    <div class="tab" id="tab-loyalty">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Fidélité Clients</h1><p>Suivez les commandes par numéro de téléphone — 10 achats = cadeau !</p></div></div>
+        <button class="btn-add" onclick="searchLoyaltyClient()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Chercher un client</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg></div><div class="stat-val" id="l-vip">—</div><div class="stat-lbl">Clients VIP</div></div>
+        <div class="stat-card" style="border-color:var(--gold)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="stat-val" id="l-gold">—</div><div class="stat-lbl">Clients Gold</div></div>
+        <div class="stat-card" style="border-color:var(--ok)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><div class="stat-val" id="l-gift">—</div><div class="stat-lbl">Cadeaux à offrir</div></div>
+        <div class="stat-card" style="border-color:var(--inf)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-val" id="l-total">—</div><div class="stat-lbl">Clients suivis</div></div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-title">
+          Règle de fidélité
+          <button class="btn-add" onclick="editLoyaltyRule()" style="font-size:.72rem;padding:.4rem .8rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Modifier la règle</button>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(201,169,110,.15),rgba(201,169,110,.05));border:1px solid var(--gold);border-radius:12px;padding:1.2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;color:var(--gold)"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+          <div>
+            <div style="font-weight:700;color:var(--bx);font-size:.95rem" id="loyaltyRuleDisplay">Après <strong>10 achats</strong>, offrir un cadeau au client fidèle</div>
+            <div style="font-size:.78rem;color:var(--tl);margin-top:.3rem">Identification via numéro de téléphone uniquement — sans compte client</div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:.72rem;color:var(--tl)">Prochains cadeaux à offrir</div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--ok)" id="giftsTotalDisplay">—</div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-title">Tous les clients fidèles <span id="loyaltyCount" style="font-family:Montserrat;font-size:.72rem;color:var(--tl)"></span></div>
+        <div id="loyaltyList"></div>
+      </div>
+    </div>
+ 
+    <!-- PROMOS -->
+    <div class="tab" id="tab-promos">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Promotions</h1><p>Réductions et codes influenceuses</p></div></div>
+        <button class="btn-add" onclick="openAddPromoCode()">+ Nouveau code promo</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Codes promo influenceuses</div>
+          <div id="promoCodesList"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Réduction rapide sur produits</div>
+          <div class="form-group"><label class="form-label">Catégorie</label>
+            <select class="form-input" id="bulkCat">
+              <option value="">Tous les produits</option>
+              <option>Boucles d'oreilles</option><option>Bracelets</option><option>Colliers</option>
+              <option>Bagues</option><option>Chaînes de cheville</option><option>Sets</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Réduction (%)</label><input class="form-input" id="bulkPct" type="number" min="1" max="99" placeholder="ex: 20"></div>
+          <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+            <button class="btn-add" onclick="applyBulkPromo()">Appliquer</button>
+            <button class="btn-sm btn-del" style="padding:.7rem 1rem;border-radius:8px" onclick="clearAllPromos()">Effacer toutes promos</button>
+          </div>
+          <div class="card-title" style="margin-top:1.5rem">Produits en promotion</div>
+          <div id="promoProductsList"></div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ANALYTICS -->
+    <div class="tab" id="tab-analytics">
+      <div class="topbar"><div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Analytiques</h1><p>Analysez vos performances</p></div></div></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-val" id="a-rev">—</div><div class="stat-lbl">Revenu total</div></div>
+        <div class="stat-card" style="border-color:var(--gold)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><div class="stat-val" id="a-avg">—</div><div class="stat-lbl">Panier moyen</div></div>
+        <div class="stat-card" style="border-color:var(--ok)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div class="stat-val" id="a-cnt">—</div><div class="stat-lbl">Commandes</div></div>
+        <div class="stat-card" style="border-color:var(--inf)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="stat-val" id="a-units">—</div><div class="stat-lbl">Bijoux vendus</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Top produits vendus</div><div id="topProds"></div></div>
+        <div class="card"><div class="card-title">Méthodes de paiement</div><div id="payAnalytics"></div></div>
+        <div class="card"><div class="card-title">Zones de livraison</div><div id="zoneAnalytics"></div></div>
+        <div class="card"><div class="card-title">Statuts commandes</div><div id="statusAnalytics"></div></div>
+      </div>
+    </div>
+ 
+    <!-- VISITORS -->
+    <div class="tab" id="tab-visitors">
+      <div class="topbar"><div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Visiteurs</h1><p>Trafic de votre boutique</p></div></div></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-val" id="v-today">—</div><div class="stat-lbl">Vues aujourd'hui</div></div>
+        <div class="stat-card" style="border-color:var(--gold)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-val" id="v-week">—</div><div class="stat-lbl">Vues semaine</div></div>
+        <div class="stat-card" style="border-color:var(--ok)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-val" id="v-month">—</div><div class="stat-lbl">Vues mois</div></div>
+        <div class="stat-card" style="border-color:var(--inf)"><div class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="stat-val" id="v-total">—</div><div class="stat-lbl">Total visites</div></div>
+      </div>
+      <div class="card full">
+        <div class="card-title">Visites par jour (30 derniers jours)</div>
+        <div class="vis-mini" id="visChart"></div>
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--tl);margin-top:.3rem"><span>J-30</span><span>J-15</span><span>Aujourd'hui</span></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Pages les plus visitées</div><div id="topPages"></div></div>
+        <div class="card"><div class="card-title">Sources estimées</div><div id="trafficSrc"></div></div>
+      </div>
+    </div>
+ 
+    <!-- MESSAGES -->
+    <div class="tab" id="tab-messages">
+      <div class="topbar"><div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Messages</h1><p>Messages reçus depuis le formulaire de contact</p></div></div></div>
+      <div class="card" id="messagesContainer"><p style="color:var(--tl);font-size:.85rem">Aucun message pour le moment.</p></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="tab" id="tab-settings">
+      <div class="topbar"><div style="display:flex;align-items:center;gap:.5rem;"><div class="hamburger" onclick="toggleSidebar()">☰</div><div><h1>Paramètres</h1><p>Configuration de votre boutique</p></div></div></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Changer le mot de passe</div>
+          <div class="form-group"><label class="form-label">Mot de passe actuel</label><input class="form-input" type="password" id="pwd-cur" placeholder="••••••••"></div>
+          <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input class="form-input" type="password" id="pwd-new" placeholder="••••••••"></div>
+          <div class="form-group"><label class="form-label">Confirmer</label><input class="form-input" type="password" id="pwd-cf" placeholder="••••••••"></div>
+          <button class="btn-add" onclick="changePwd()">Modifier le mot de passe</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Infos boutique</div>
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" value="Sytam Jewelry"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="sytamjewelry@gmail.com"></div>
+          <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" value="+221 77 478 98 75"></div>
+          <button class="btn-add" onclick="showToast('✓ Sauvegardé','')">Sauvegarder</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Numéros de paiement</div>
+          <div class="form-group"><label class="form-label">Wave Business</label><input class="form-input" value="774789875"></div>
+          <div class="form-group"><label class="form-label">Orange Money</label><input class="form-input" placeholder="Non configuré"></div>
+          <div class="form-group"><label class="form-label">Free Money</label><input class="form-input" placeholder="Non configuré"></div>
+          <button class="btn-add" onclick="showToast('✓ Sauvegardé','')">Sauvegarder</button>
+        </div>
+        <div class="card" id="ntfySettingsCard">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Notifications téléphone (ntfy)</div>
+          <p style="font-size:.82rem;color:var(--tl);margin-bottom:1rem;line-height:1.7;">Recevez une notification sur votre téléphone à chaque nouvelle commande — gratuit, sans compte, sans pub.</p>
+          <div style="background:var(--cr);border-radius:10px;border:1px solid var(--bd);padding:.8rem;margin-bottom:1rem;font-size:.82rem;">
+            <strong>📱 3 étapes :</strong><br>
+            1. Installe <strong>ntfy</strong> sur ton téléphone (Play Store / App Store)<br>
+            2. Ouvre l'app → clique <strong>"+"</strong> → abonne-toi au topic <code style="background:rgba(0,0,0,.06);padding:2px 6px;border-radius:4px;font-size:.78rem" id="ntfyTopicDisplay">sytam-orders</code><br>
+            3. Configure ci-dessous et clique <strong>Tester</strong>
+          </div>
+          <div class="form-group"><label class="form-label">Topic ntfy</label><input class="form-input" id="ntfyTopic" placeholder="sytam-orders" style="font-family:monospace"></div>
+          <button class="btn-add" onclick="saveNtfy()">Enregistrer</button>
+          <button class="btn-sm btn-ok" onclick="testNtfy()" style="margin-left:.5rem;padding:.6rem 1rem;border-radius:8px">Tester</button>
+          <span id="ntfyStatus" style="font-size:.78rem;margin-left:.5rem;"></span>
+        </div>
+        <div class="card">
+          <div class="card-title">Données de test</div>
+          <p style="font-size:.82rem;color:var(--tl);margin-bottom:1rem;line-height:1.7">Générez des commandes fictives pour tester le tableau de bord.</p>
+          <button class="btn-add" onclick="genDemo()" style="margin-bottom:.7rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="2" y="2" width="8" height="8"/><rect x="14" y="2" width="8" height="8"/><rect x="2" y="14" width="8" height="8"/><rect x="14" y="14" width="8" height="8"/></svg> Générer commandes démo</button><br>
+          <button class="btn-sm btn-del" style="padding:.7rem 1rem;border-radius:8px;margin-top:.5rem" onclick="clearOrders()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Effacer toutes les commandes</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Sauvegarde</div>
+          <p style="font-size:.82rem;color:var(--tl);margin-bottom:1rem;line-height:1.7">Exportez toutes les données (commandes, produits, messages) en JSON.</p>
+          <button class="btn-add" onclick="exportData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter tout</button>
+        </div>
+      </div>
+    </div>
+ 
+  </main>
+</div>
+</div>
+ 
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-loader.js"></script>
+<script src="js/admin.js?v=20250608"></script>
+<div id="v" style="position:fixed;bottom:5px;right:5px;font-size:9px;color:rgba(0,0,0,0.2);z-index:9999;background:rgba(0,0,0,0.05);padding:2px 6px;border-radius:3px">v22</div>
+</body>
+</html>

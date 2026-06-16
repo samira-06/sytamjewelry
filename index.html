@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Sytam Jewelry — Bijoux Fantaisie</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=20250608">
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">SYTAM <span>JEWELRY</span></div>
+  <div class="nav-links">
+    <a onclick="showPage('home')" id="nav-home" class="active">Accueil</a>
+    <a onclick="showPage('shop')" id="nav-shop">Boutique</a>
+    <a onclick="showPage('custom')" id="nav-custom">Personnalisation</a>
+    <a onclick="showPage('contact')" id="nav-contact">Contactez-nous</a>
+  </div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="showPage('cart')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:middle;margin-right:4px"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Panier <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ======================================================
+     PAGE : ACCUEIL
+     Contient : Hero, Catégories, Teaser Perso, Quote, FAQ, Footer
+====================================================== -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-tag">Nouvelle Collection</div>
+      <h1>La magie vous<br>attend dans<br>notre <em>boutique</em></h1>
+      <p>Découvrez notre collection unique de bijoux en acier inoxydable, des créations audacieuses conçues pour sublimer votre style.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('shop')">Découvrir la boutique</button>
+        <button class="btn-outline" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})">Voir les catégories</button>
+      </div>
+    </div>
+    <div class="hero-images" style="position:relative;width:700px;height:650px;">
+      <div style="position:absolute;width:550px;height:540px;top:120px;right:40px;z-index:1;border-radius:18px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,0.35);border:3px solid rgba(201,169,110,0.35);">
+        <img src="images\set.png" alt="Collection bijoux" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div style="position:absolute;width:450px;height:520px;top:-40px;right:40px;z-index:2;border-radius:22px;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.45);border:5px solid rgba(201,169,110,0.4);">
+        <img src="images\image.png" alt="Bijou vedette" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section" id="categories">
+    <div class="section-title">
+      <h2><span class="label"></span>Nos bijoux les plus prisés<span class="label-right"></span></h2>
+      <p>Sélectionnés par nos clients les plus fidèles</p>
+    </div>
+    <div class="categories-grid">
+      <div class="category-card" onclick="filterAndGoShop('Boucles d\'oreilles')">
+        <div class="category-card-bg"><img src="images\boucles.png" alt="Boucles d'oreilles" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="category-overlay"><div class="category-num">01</div><div class="category-name">Boucles d'oreilles</div></div>
+      </div>
+      <div class="category-card" onclick="filterAndGoShop('Bracelets')">
+        <div class="category-card-bg"><img src="images\bracelet.png" alt="Bracelets" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="category-overlay"><div class="category-num">02</div><div class="category-name">Bracelets</div></div>
+      </div>
+      <div class="category-card" onclick="filterAndGoShop('Colliers')">
+        <div class="category-card-bg"><img src="images\chaine.png" alt="Colliers" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="category-overlay"><div class="category-num">03</div><div class="category-name">Colliers / Chaînes</div></div>
+      </div>
+      <div class="category-card" onclick="filterAndGoShop('Bagues')">
+        <div class="category-card-bg"><img src="images\bague.png" alt="Bagues" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="category-overlay"><div class="category-num">04</div><div class="category-name">Bagues</div></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button class="btn-outline" style="border-color:var(--bordeaux);color:var(--bordeaux);" onclick="showPage('shop')">Voir toute la boutique →</button>
+    </div>
+  </section>
+
+  <!-- TEASER PERSONNALISATION -->
+  <section style="background:linear-gradient(135deg,var(--bordeaux-dark),var(--bordeaux));padding:4rem 6rem;text-align:center;">
+    <div style="max-width:600px;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(201,169,110,0.2);border:1px solid var(--gold);color:var(--gold-light);font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;padding:0.4rem 1rem;border-radius:20px;margin-bottom:1.5rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Service exclusif</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:var(--white);line-height:1.2;margin-bottom:1rem;">Bijoux <em style="color:var(--gold-light);font-style:italic;">gravés</em><br>à votre nom</h2>
+      <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.8;margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto;">Chaînes et bracelets personnalisés avec votre prénom, vos initiales ou un message. Fabriqués sur mesure en 2 à 4 semaines.</p>
+      <button class="btn-primary" onclick="showPage('custom')">Personnaliser mon bijou →</button>
+    </div>
+  </section>
+
+  <!-- QUOTE — uniquement sur l'accueil -->
+  <section class="quote-section">
+    <blockquote>"Les plus belles choses au monde ne se voient pas et ne se touchent pas, elles se ressentent avec le cœur."</blockquote>
+    <cite>— Coco Chanel</cite>
+  </section>
+
+  <!-- FAQ — uniquement sur l'accueil -->
+  <section class="section">
+    <div class="section-title">
+      <h2><span class="label"></span>Questions fréquentes<span class="label-right"></span></h2>
+      <p>Trouvez rapidement les réponses à vos questions</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Quelle est votre politique de retour ?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Retours sous 7 jours (article non porté, état d'origine). Produits personnalisés non remboursables sauf défaut. Voir le récapitulatif avant validation de commande pour le détail complet.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Quels sont les modes de paiement acceptés ?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Nous acceptons Wave, Orange Money et Free Money. Vous envoyez le paiement au numéro indiqué lors de la validation de commande et nous confirmons dès réception.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Quels sont les frais et délais de livraison ?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Livraison à Dakar (zones proches) : 2 000 FCFA. Zones éloignées de Dakar (Keur Massar, Mbao, etc.) : 3 000 FCFA. Hors Dakar / Régions : 5 000 FCFA. Délai de livraison : 24h à 72h selon la zone.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Puis-je commander un bijou en rupture de stock ?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Absolument ! Contactez-nous via le formulaire de contact ou WhatsApp. Nous pourrons vous informer du délai de réapprovisionnement et réserver l'article pour vous.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Proposez-vous des cartes-cadeaux ?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Oui ! Nous proposons des cartes-cadeaux numériques envoyées par email. Contactez-nous pour en commander une, disponible à partir de 5 000 FCFA.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER — uniquement sur l'accueil -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">SYTAM JEWELRY</div>
+        <p class="footer-about">Sytam Jewelry est une boutique spécialisée dans la revente de bijoux tendance, choisis pour leur qualité, esthétique et accessibilité.</p>
+        <div class="footer-socials">
+          <a class="social-btn" title="Instagram" href="https://www.instagram.com/sytamjewelry" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a class="social-btn" title="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a>
+          <a class="social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Boutique</h4>
+        <ul>
+          <li><a onclick="filterAndGoShop('Boucles d\'oreilles')">Boucles d'oreilles</a></li>
+          <li><a onclick="filterAndGoShop('Bracelets')">Bracelets</a></li>
+          <li><a onclick="filterAndGoShop('Colliers')">Colliers / Chaînes</a></li>
+          <li><a onclick="filterAndGoShop('Bagues')">Bagues</a></li>
+          <li><a onclick="filterAndGoShop('Sets')">Sets</a></li>
+          <li><a onclick="filterAndGoShop('Chaînes de cheville')">Chaînes de cheville</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Personnalisation</h4>
+        <ul>
+          <li><a onclick="showPage('custom')">Chaîne gravée</a></li>
+          <li><a onclick="showPage('custom')">Bracelet gravé</a></li>
+          <li><a onclick="showPage('custom')">Comment commander</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Rejoignez-nous</h4>
+        <ul>
+          <li><a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> sytamjewelry@gmail.com</a></li>
+          <li><a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> +221 77 478 98 75</a></li>
+          <li><a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Dakar, Sénégal</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>Copyright © 2025 Sytam Jewelry — Tous droits réservés</p></div>
+  </footer>
+
+</div>
+<!-- ======================================================
+     FIN PAGE ACCUEIL
+====================================================== -->
+
+
+<!-- ======================================================
+     PAGE : BOUTIQUE
+====================================================== -->
+<div class="page" id="page-shop">
+  <div class="shop-header">
+    <h1>Notre Boutique</h1>
+    <p>Découvrez toute notre collection de bijoux fantaisie en acier inoxydable</p>
+  </div>
+  <div class="shop-layout">
+    <aside class="shop-sidebar">
+      <h3>Catégories</h3>
+      <button class="filter-btn active" onclick="filterProducts('all', this)">Tous les produits</button>
+      <button class="filter-btn" onclick="filterProducts('Boucles d\'oreilles', this)">Boucles d'oreilles</button>
+      <button class="filter-btn" onclick="filterProducts('Bracelets', this)">Bracelets</button>
+      <button class="filter-btn" onclick="filterProducts('Colliers', this)">Colliers / Chaînes</button>
+      <button class="filter-btn" onclick="filterProducts('Bagues', this)">Bagues</button>
+      <button class="filter-btn" onclick="filterProducts('Sets', this)">Sets</button>
+      <button class="filter-btn" onclick="filterProducts('Chaînes de cheville', this)">Chaînes de cheville</button>
+      <h3>Prix</h3>
+      <div class="price-range">
+        <input type="range" id="priceRange" min="0" max="25000" value="25000" step="500" oninput="updatePriceFilter(this.value)">
+        <div class="price-labels"><span>0 FCFA</span><span id="priceMax">25 000 FCFA</span></div>
+      </div>
+    </aside>
+    <div>
+      <div class="shop-top">
+        <div class="shop-count" id="shopCount">20 produits</div>
+        <select class="sort-select" onchange="sortProducts(this.value)">
+          <option value="featured">En vedette</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+          <option value="name">Nom A-Z</option>
+        </select>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </div>
+  <div style="background:var(--bordeaux-dark);color:rgba(255,255,255,0.5);text-align:center;padding:1.5rem;font-size:0.78rem;margin-top:3rem;">Copyright © 2025 Sytam Jewelry</div>
+</div>
+<!-- ======================================================
+     FIN PAGE BOUTIQUE
+====================================================== -->
+
+
+<!-- ======================================================
+     PAGE : PERSONNALISATION
+====================================================== -->
+<div class="page" id="page-custom">
+
+  <div class="custom-page-hero">
+    <div class="custom-hero-text">
+      <div class="custom-hero-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Service exclusif</div>
+      <h1>Votre bijou,<br>gravé à votre <em>nom</em></h1>
+      <p>Chaîne, bracelet ou set complet en acier inoxydable — personnalisez avec votre prénom, vos initiales ou un message secret. Livré en écrin cadeau.</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem">
+        <button class="btn-primary" style="border-radius:10px;" onclick="openCustomOrderModal('chaine-gold')">Commander une chaîne</button>
+        <button class="btn-outline" style="border-radius:10px;" onclick="openCustomOrderModal('bracelet')">Commander un bracelet</button>
+      </div>
+    </div>
+    <div class="custom-hero-mockup">
+      <div class="mockup-jewelry-display">
+        <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;">Aperçu gravure</div>
+        <div style="width:80%;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);border-radius:2px;"></div>
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:2rem;color:var(--gold-light);letter-spacing:6px;text-shadow:0 2px 20px rgba(201,169,110,0.5);">Fatou</div>
+        <div style="width:80%;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);border-radius:2px;"></div>
+        <div style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-top:0.5rem;box-shadow:0 0 25px rgba(201,169,110,0.2);">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;color:var(--gold-light);letter-spacing:2px;text-align:center;">Mon<br>bracelet</div>
+        </div>
+        <div style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);border-radius:8px;padding:0.4rem 1rem;font-size:0.68rem;color:var(--gold-light);letter-spacing:1px;">✓ Or 18K • Acier inoxydable</div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="custom-process">
+    <div class="custom-process-title">
+      <h2>Comment ça marche ?</h2>
+      <p style="color:var(--text-light);font-size:0.85rem;margin-top:0.4rem;">De la commande à la livraison en 4 étapes simples</p>
+    </div>
+    <div class="custom-process-steps">
+      <div class="cproc-step"><div class="cproc-num"><span class="cproc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span></div><div class="cproc-title">Personnalisez</div><div class="cproc-desc">Choisissez le bijou, entrez votre texte et sélectionnez la police et la couleur</div></div>
+      <div class="cproc-step"><div class="cproc-num"><span class="cproc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div><div class="cproc-title">Payez l'acompte</div><div class="cproc-desc">Wave ou Orange Money au <strong>77 478 98 75</strong> — acompte requis pour lancer la fabrication</div></div>
+      <div class="cproc-step"><div class="cproc-num"><span class="cproc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></div><div class="cproc-title">Confirmation</div><div class="cproc-desc">Nous vous contactons sous 24h pour valider le design final</div></div>
+      <div class="cproc-step"><div class="cproc-num"><span class="cproc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span></div><div class="cproc-title">Fabrication</div><div class="cproc-desc">Votre bijou est fabriqué sur mesure en 2 à 4 semaines</div></div>
+      <div class="cproc-step"><div class="cproc-num"><span class="cproc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div><div class="cproc-title">Livraison</div><div class="cproc-desc">Réception dans un écrin cadeau. Solde à payer à la livraison</div></div>
+    </div>
+  </div>
+
+  <div class="benefits-section">
+    <div class="benefits-grid">
+      <div style="text-align:center;padding:1.5rem;background:var(--cream);border-radius:14px;border:1px solid var(--border);">
+        <div style="margin-bottom:0.7rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--accent)"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+        <div style="font-weight:700;color:var(--bordeaux-dark);font-size:0.82rem;margin-bottom:0.3rem;">Résistant à l'eau</div>
+        <div style="font-size:0.72rem;color:var(--text-light);">Acier inoxydable haute qualité</div>
+      </div>
+      <div style="text-align:center;padding:1.5rem;background:var(--cream);border-radius:14px;border:1px solid var(--border);">
+        <div style="margin-bottom:0.7rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--accent)"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg></div>
+        <div style="font-weight:700;color:var(--bordeaux-dark);font-size:0.82rem;margin-bottom:0.3rem;">Anti-allergène</div>
+        <div style="font-size:0.72rem;color:var(--text-light);">Sans nickel, sans plomb</div>
+      </div>
+      <div style="text-align:center;padding:1.5rem;background:var(--cream);border-radius:14px;border:1px solid var(--border);">
+        <div style="margin-bottom:0.7rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--accent)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div style="font-weight:700;color:var(--bordeaux-dark);font-size:0.82rem;margin-bottom:0.3rem;">Gravure précise</div>
+        <div style="font-size:0.72rem;color:var(--text-light);">Laser haute définition</div>
+      </div>
+      <div style="text-align:center;padding:1.5rem;background:var(--cream);border-radius:14px;border:1px solid var(--border);">
+        <div style="margin-bottom:0.7rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--accent)"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg></div>
+        <div style="font-weight:700;color:var(--bordeaux-dark);font-size:0.82rem;margin-bottom:0.3rem;">Écrin cadeau</div>
+        <div style="font-size:0.72rem;color:var(--text-light);">Livré dans un beau coffret</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--bordeaux-dark);color:rgba(255,255,255,0.5);text-align:center;padding:1.5rem;font-size:0.78rem;">Copyright © 2025 Sytam Jewelry</div>
+
+</div>
+<!-- ======================================================
+     FIN PAGE PERSONNALISATION
+====================================================== -->
+
+
+<!-- ======================================================
+     PAGE : PANIER
+====================================================== -->
+<div class="page" id="page-cart">
+  <div class="cart-page">
+    <h1 class="page-title">Mon Panier</h1>
+    <div class="cart-layout">
+      <div>
+        <div id="cartItems"></div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn-outline" style="border-color:var(--bordeaux);color:var(--bordeaux);" onclick="showPage('shop')">← Continuer mes achats</button>
+        </div>
+      </div>
+      <div>
+        <div class="order-summary">
+          <h3>Résumé de commande</h3>
+          <div class="summary-row"><span>Sous-total</span><span id="subtotal">0 FCFA</span></div>
+          <div class="delivery-section">
+            <h4>Zone de livraison</h4>
+            <div class="delivery-option selected" onclick="selectDelivery(this, 2000, 'Dakar Centre')" data-price="2000">
+              <div><div class="d-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Dakar Centre</div><div class="d-desc">Plateau, Médina, Fann, Point E, etc.</div></div>
+              <div class="d-price">2 000 FCFA</div>
+            </div>
+            <div class="delivery-option" onclick="selectDelivery(this, 3000, 'Dakar Banlieue')" data-price="3000">
+              <div><div class="d-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Dakar Banlieue</div><div class="d-desc">Keur Massar, Mbao, Pikine, Guédiawaye...</div></div>
+              <div class="d-price">3 000 FCFA</div>
+            </div>
+            <div class="delivery-option" onclick="selectDelivery(this, 5000, 'Hors Dakar')" data-price="5000">
+              <div><div class="d-name">Régions</div><div class="d-desc">Thiès, Saint-Louis, Ziguinchor, Kaolack...</div></div>
+              <div class="d-price">5 000 FCFA</div>
+            </div>
+          </div>
+          <div class="summary-row"><span>Livraison</span><span id="deliveryCost">2 000 FCFA</span></div>
+          <div class="summary-row total"><span>TOTAL</span><span id="totalCost">0 FCFA</span></div>
+          <div style="margin-top:1.5rem;">
+            <h4 style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--bordeaux-dark);margin-bottom:0.8rem;font-weight:700;">Vos informations</h4>
+            <div class="form-group"><label class="form-label">Nom complet</label><input type="text" class="form-input" id="customerName" placeholder="Votre nom"></div>
+            <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" id="customerPhone" placeholder="+221 7X XXX XX XX"></div>
+            <div class="form-group"><label class="form-label">Adresse de livraison</label><input type="text" class="form-input" id="customerAddress" placeholder="Quartier, rue..."></div>
+          </div>
+          <div class="payment-methods">
+            <h4>Mode de paiement</h4>
+            <div class="payment-tab">
+              <button class="pay-btn active" onclick="selectPayment(this,'wave')"><span class="pay-icon"><img src="images/wave.png" style="height:24px;vertical-align:middle;object-fit:contain" alt="Wave"></span>Wave</button>
+              <button class="pay-btn" onclick="selectPayment(this,'orange')"><span class="pay-icon"><img src="images/orange.jpg" style="height:24px;vertical-align:middle;object-fit:contain" alt="Orange Money"></span>Orange Money</button>
+              <button class="pay-btn" onclick="selectPayment(this,'free')"><span class="pay-icon"><img src="images/free.png" style="height:24px;vertical-align:middle;object-fit:contain" alt="Free Money"></span>Free Money</button>
+            </div>
+            <div class="payment-info" id="paymentInfo">
+              <strong>Paiement Wave</strong><br>Envoyez le montant total au :<br>
+              <span class="num">77 478 98 75</span>
+              <div class="note">⚠️ Envoyez une capture d'écran sur WhatsApp pour confirmation.</div>
+            </div>
+          </div>
+          <div style="margin:1rem 0;">
+            <div onclick="var d=this.nextElementSibling,mh=d.style.maxHeight;if(mh==='0px'||!mh){d.style.maxHeight='800px';this.querySelector('.pol-icon').style.transform='rotate(90deg)'}else{d.style.maxHeight='0px';this.querySelector('.pol-icon').style.transform='rotate(0deg)'}" style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text-light);cursor:pointer;letter-spacing:0.5px;user-select:none;">
+              <span class="pol-icon" style="display:inline-block;transition:transform 0.2s;">▶</span> Politique de remboursement
+            </div>
+            <div style="overflow-y:auto;max-height:0px;transition:max-height 0.3s ease;font-size:0.72rem;color:var(--text-light);line-height:1.7;background:var(--cream);border-radius:8px;margin-top:4px;">
+              <div style="padding:0.7rem 0.8rem;">
+                <strong>Politique de remboursement – SYTAM Jewelry</strong><br>
+                Chez SYTAM Jewelry, nous mettons tout en œuvre pour garantir la qualité de nos produits et la satisfaction de nos clientes.<br><br>
+                <strong>1. Retours et échanges</strong><br>
+                Les clientes disposent d'un délai de 7 jours après réception de leur commande pour signaler un problème concernant un article reçu.<br><br>
+                Pour être éligible à un retour ou un échange, l'article doit :<br>
+                — Être non porté et non utilisé ;<br>
+                — Être retourné dans son état d'origine ;<br>
+                — Être accompagné de son emballage d'origine lorsque cela est possible.<br><br>
+                <strong>2. Produits défectueux ou erreur de commande</strong><br>
+                Si vous recevez un article défectueux, endommagé ou différent de celui commandé, veuillez nous contacter dans les 48 heures suivant la réception en joignant des photos du produit concerné.<br><br>
+                Après vérification, SYTAM Jewelry pourra proposer :<br>
+                — Le remplacement de l'article<br><br>
+                <strong>3. Produits personnalisés</strong><br>
+                Les bijoux personnalisés (prénom, date, initiales, texte personnalisé ou toute création sur mesure) ne sont ni remboursables ni échangeables, sauf en cas d'erreur de fabrication ou de défaut constaté.<br><br>
+                Nous invitons les clientes à vérifier attentivement les informations fournies avant validation de leur commande.<br><br>
+                <strong>4. Remboursements</strong><br>
+                Lorsque le remboursement est approuvé, il est effectué via le même moyen de paiement utilisé lors de la commande lorsque cela est possible.<br><br>
+                Les délais de traitement peuvent varier selon le mode de paiement utilisé.<br><br>
+                <strong>5. Frais de retour</strong><br>
+                Sauf erreur de notre part ou produit défectueux, les frais de retour restent à la charge de la cliente.<br><br>
+                <strong>6. Contact</strong><br>
+                Pour toute demande concernant un retour ou un remboursement, veuillez contacter notre service client en indiquant votre numéro de commande et les détails de votre demande.
+              </div>
+            </div>
+          </div>
+          <button class="checkout-btn" id="checkoutBtn" onclick="placeOrder()">✓ Valider ma commande</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ======================================================
+     FIN PAGE PANIER
+====================================================== -->
+
+
+<!-- ======================================================
+     PAGE : CONTACT
+====================================================== -->
+<div class="page" id="page-contact">
+  <div style="background:linear-gradient(to right, var(--bordeaux-dark), var(--bordeaux));padding:3rem 6rem;color:white;">
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:400;">Contactez-nous</h1>
+    <p style="opacity:0.7;font-size:0.85rem;margin-top:0.5rem;">Nous sommes là pour vous aider</p>
+  </div>
+  <div class="contact-page">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Parlons bijoux !</h2>
+        <p>Vous avez une question sur nos produits, une commande personnalisée, ou besoin d'aide ? N'hésitez pas à nous contacter.</p>
+        <div class="contact-item"><div class="contact-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="contact-item-text"><strong>Téléphone / WhatsApp</strong><span>+221 77 478 98 75</span></div></div>
+        <div class="contact-item"><div class="contact-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="contact-item-text"><strong>Email</strong><span>sytamjewelry@gmail.com</span></div></div>
+        <div class="contact-item"><div class="contact-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="contact-item-text"><strong>Localisation</strong><span>Dakar, Sénégal</span></div></div>
+        <div class="contact-item"><div class="contact-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="contact-item-text"><strong>Disponibilité</strong><span>Lun - Dim : 9h - 20h</span></div></div>
+      </div>
+      <div class="contact-form-card">
+        <h3>Envoyer un message</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" type="text" placeholder="Votre prénom"></div>
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" type="text" placeholder="Votre nom"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="votre@email.com"></div>
+        <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" type="tel" placeholder="+221 7X XXX XX XX"></div>
+        <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" rows="5" placeholder="Votre message..."></textarea></div>
+        <button class="btn-primary" style="width:100%;border-radius:10px;" onclick="sendContact()">Envoyer le message →</button>
+      </div>
+  </div>
+  <div id="v" style="position:fixed;bottom:5px;right:5px;font-size:9px;color:rgba(0,0,0,0.15);z-index:9999">v22</div>
+</footer>
+
+<!-- ======================================================
+      FIN PAGE CONTACT
+====================================================== -->
+
+
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-loader.js"></script>
+<script src="js/main.js?v=20250608"></script>
+</body>
+</html>
+
