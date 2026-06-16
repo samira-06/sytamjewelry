@@ -224,9 +224,19 @@ function initAdmin(){
       try {
         const data = await fbLoadAllData();
         if (data.products && data.products.length) {
-          try { SET('sytamProducts', data.products); }
+          // Préserver les images locales si Supabase n'en a pas
+          var localProds = G('sytamProducts');
+          var merged = data.products.map(function(p){
+            var local = localProds ? localProds.find(function(x){ return x.id===p.id; }) : null;
+            if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length) && (!p.image||p.image.length<100)){
+              p.images = local.images || [local.image];
+              if(p.images.length) p.image = p.images[0];
+            }
+            return p;
+          });
+          try { SET('sytamProducts', merged); }
           catch(e) {
-            const local = data.products.map(x => ({ ...x, image: '', images: [] }));
+            const local = merged.map(x => ({ ...x, image: '', images: [] }));
             SET('sytamProducts', local);
           }
           if (document.getElementById('tab-products').classList.contains('active')) renderStockTable();
@@ -851,13 +861,13 @@ function saveImg(id){
   if(url.startsWith('data:')){
     const idx = p.images.length-1;
     dbSaveImg(id+'_'+idx, url).then(() => {
-      try { SET('sytamProducts', prods); }
-      catch(e){ showToast('❌ Stockage plein',''); return; }
+      try { SET('sytamProducts', prods); } catch(e){ showToast('❌ Stockage plein',''); return; }
+      fbSaveProducts(prods).catch(function(){});
       renderStockTable();closeModal();showToast('✓ Photo ajoutée','');
     });
   } else {
-    try { SET('sytamProducts', prods); }
-    catch(e){ showToast('❌ Stockage plein',''); return; }
+    try { SET('sytamProducts', prods); } catch(e){ showToast('❌ Stockage plein',''); return; }
+    fbSaveProducts(prods).catch(function(){});
     renderStockTable();closeModal();showToast('✓ Photo ajoutée','');
   }
 }
@@ -871,6 +881,7 @@ function delProductImg(id, idx){
   if(p.images.length) p.image = p.images[0];
   else { p.image = ''; delete p.images; }
   try { SET('sytamProducts', prods); } catch(e){}
+  fbSaveProducts(prods).catch(function(){});
   dbDelImg(id+'_'+idx).catch(function(){});
   editImg(id);
 }

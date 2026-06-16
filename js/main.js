@@ -872,7 +872,16 @@ function showNotif(msg){
     try {
       const data = await fbLoadAllData();
       if (data.products && data.products.length) {
-        products = data.products;
+        // Préserver les images locales si Supabase n'en a pas
+        var localProds = G('sytamProducts');
+        products = data.products.map(function(p){
+          var local = localProds ? localProds.find(function(x){ return x.id===p.id; }) : null;
+          if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length) && (!p.image||p.image.length<100)){
+            p.images = local.images || [local.image];
+            if(p.images.length) p.image = p.images[0];
+          }
+          return p;
+        });
         try { localStorage.setItem('sytamProducts', JSON.stringify(products)); }
         catch(e) {
           const local = products.map(x => ({ ...x, image: '', images: [] }));
