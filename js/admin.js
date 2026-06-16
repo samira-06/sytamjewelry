@@ -106,8 +106,20 @@ function dbDelImg(id){
     tx.onerror = e => reject(e.target.error);
   }));
 }
-function getImgSrc(p){
-  return imgCache['p'+p.id] || p.image || '';
+function getImgSrc(p, idx){
+  const i = idx || 0;
+  if(p.images && p.images.length > i){
+    const cached = imgCache['p'+p.id+'_'+i];
+    if (cached) return cached;
+    if (p.images[i]) return p.images[i];
+  }
+  if(i===0) return imgCache['p'+p.id] || p.image || '';
+  return '';
+}
+function getImgCount(p){
+  if(p.images && p.images.length) return p.images.length;
+  if(imgCache['p'+p.id] || p.image) return 1;
+  return 0;
 }
 dbLoadAll();
  
@@ -186,11 +198,11 @@ function saveProds(p){
   // Save to localStorage (if too large, strip images)
   try { SET('sytamProducts', p); }
   catch(e) {
-    const local = p.map(x => ({ ...x, image: '' }));
+    const local = p.map(x => ({ ...x, image: '', images: [] }));
     SET('sytamProducts', local);
   }
-  // Sync full data (with images) to Firestore
-  fbSaveProducts(p).catch(e => console.warn('saveProds Firebase fail',e));
+  // Sync full data (with images) to Supabase
+  fbSaveProducts(p).catch(e => console.warn('saveProds Supabase fail',e));
 }
 function saveOrders(o){
   SET('sytamOrders', o);
@@ -214,7 +226,7 @@ function initAdmin(){
         if (data.products && data.products.length) {
           try { SET('sytamProducts', data.products); }
           catch(e) {
-            const local = data.products.map(x => ({ ...x, image: '' }));
+            const local = data.products.map(x => ({ ...x, image: '', images: [] }));
             SET('sytamProducts', local);
           }
           if (document.getElementById('tab-products').classList.contains('active')) renderStockTable();
@@ -775,15 +787,21 @@ function renderStockTable(){
  
 function editImg(id){
   const p=getProds().find(x=>x.id===id);
-  const src=getImgSrc(p);
+  const imgs = p.images || (getImgSrc(p) ? [getImgSrc(p)] : []);
+  let thumbs = imgs.map((url,i)=>`
+    <div style="position:relative;display:inline-block;margin:4px;border:1px solid var(--bd);border-radius:8px;overflow:hidden;width:80px;height:80px;">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.remove()">
+      <span onclick="delProductImg(${id},${i})" style="position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(220,53,69,0.8);color:#fff;border-radius:50%;font-size:12px;line-height:18px;text-align:center;cursor:pointer;">✕</span>
+    </div>
+  `).join('');
   openModal('<button class="modal-x" onclick="closeModal()">✕</button>'+
-    '<h2>Photo — '+p.name+'</h2>'+
-    (src?'<img src="'+src+'" style="width:100%;height:150px;object-fit:contain;border-radius:10px;margin-bottom:1rem">':'')+
-    '<div class="img-upload" onclick="document.getElementById(\'imgFile\').click()">📷 Choisir une image<input type="file" id="imgFile" accept="image/*" onchange="previewImg(event,'+id+')"></div>'+
+    '<h2>Photos — '+p.name+'</h2>'+
+    '<div id="imgThumbs" style="min-height:60px;margin-bottom:.8rem;text-align:center">'+(thumbs||'<span style="color:var(--tl);font-size:.82rem">Aucune photo</span>')+'</div>'+
+    '<div class="img-upload" onclick="document.getElementById(\'imgFile\').click()">📷 Ajouter une photo<input type="file" id="imgFile" accept="image/*" onchange="previewImg(event,'+id+')"></div>'+
     '<img id="imgPreview" style="width:100%;height:120px;object-fit:contain;border-radius:8px;margin-top:.8rem;display:none">'+
-    '<div class="form-group" style="margin-top:1rem"><label class="form-label">Ou URL / chemin</label><input class="form-input" id="imgUrl" placeholder="https://... ou images/mon-produit.jpg" value="'+(p.image||'')+'"></div>'+
-    '<div style="font-size:.7rem;color:var(--tl);margin-bottom:.5rem">💡 Déposez vos images dans <strong>images/</strong> et entrez le chemin (ex: <code>images/mon-produit.jpg</code>) pour zéro limite de stockage</div>'+
-    '<button class="btn-add" style="width:100%;margin-top:.5rem;border-radius:10px" onclick="saveImg('+id+')">Enregistrer la photo</button>');
+    '<div class="form-group" style="margin-top:.8rem"><label class="form-label">Ou URL / chemin</label><input class="form-input" id="imgUrl" placeholder="https://... ou images/mon-produit.jpg"></div>'+
+    '<div style="font-size:.7rem;color:var(--tl);margin-bottom:.5rem">💡 Vous pouvez ajouter plusieurs photos. La première sera l\'image principale.</div>'+
+    '<button class="btn-add" style="width:100%;margin-top:.5rem;border-radius:10px" onclick="saveImg('+id+')">Ajouter la photo</button>');
 }
  
 function compressImage(file, maxW, quality, cb){
@@ -810,7 +828,7 @@ function previewImg(e,id){
     document.getElementById('imgPreview').src=url;
     document.getElementById('imgPreview').style.display='block';
     document.getElementById('imgUrl').value=url;
-    showToast('✓ Image compressée, clique sur "Enregistrer"','');
+    showToast('✓ Image compressée, clique sur "Ajouter la photo"','');
   });
 }
  
@@ -824,19 +842,37 @@ function saveImg(id){
   catch(e){ showToast('❌ Erreur de données',''); return; }
   const p=prods.find(x=>x.id===id);
   if(!p){ showToast('❌ Produit introuvable',''); return; }
+  if(!p.images) p.images = [];
+  if(p.image && p.image.length > 100 && !p.images.includes(p.image)){
+    p.images.unshift(p.image);
+  }
+  p.images.push(url);
+  p.image = p.images[0];
   if(url.startsWith('data:')){
-    dbSaveImg(id, url).then(() => {
-      p.image = url;
+    const idx = p.images.length-1;
+    dbSaveImg(id+'_'+idx, url).then(() => {
       try { SET('sytamProducts', prods); }
       catch(e){ showToast('❌ Stockage plein',''); return; }
-      renderStockTable();closeModal();showToast('✓ Photo sauvegardée','');
+      renderStockTable();closeModal();showToast('✓ Photo ajoutée','');
     });
   } else {
-    p.image = url;
     try { SET('sytamProducts', prods); }
     catch(e){ showToast('❌ Stockage plein',''); return; }
-    renderStockTable();closeModal();showToast('✓ Chemin enregistré','');
+    renderStockTable();closeModal();showToast('✓ Photo ajoutée','');
   }
+}
+function delProductImg(id, idx){
+  let prods;
+  try { prods = JSON.parse(localStorage.getItem('sytamProducts')||'null')||DEFAULT_PRODUCTS; }
+  catch(e){ return; }
+  const p=prods.find(x=>x.id===id);
+  if(!p || !p.images) return;
+  p.images.splice(idx, 1);
+  if(p.images.length) p.image = p.images[0];
+  else { p.image = ''; delete p.images; }
+  try { SET('sytamProducts', prods); } catch(e){}
+  dbDelImg(id+'_'+idx).catch(function(){});
+  editImg(id);
 }
  
 function editStock(id){
@@ -1148,8 +1184,10 @@ function saveNewProduct(){
     if(n) sizes.push({name:n, stock:s});
   });
   const finalStock = sizes.length>0 ? sizes.reduce((sum,x)=>sum+x.stock,0) : stock;
+  const newImg = document.getElementById('np-img').value.trim()||'';
   prods.push({id,name,category:document.getElementById('np-cat').value,price,stock:finalStock,sold:0,
-    image:document.getElementById('np-img').value.trim()||'',
+    image: newImg,
+    images: newImg ? [newImg] : [],
     badge:document.getElementById('np-badge').value||null,
     description:document.getElementById('np-desc')?.value.trim()||'',
     promo:null, colors, sizes: sizes.length?sizes:undefined});

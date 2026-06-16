@@ -19,11 +19,24 @@ function dbLoadAll(){
     r.onerror = e => reject(e.target.error);
   })).catch(() => {});
 }
-function getImgSrc(p){
-  const cached = imgCache['p'+p.id];
-  if (cached && cached.length > 100) return cached;
-  if (p.image && p.image.length > 100) return p.image;
+function getImgSrc(p, idx){
+  const i = idx || 0;
+  if(p.images && p.images.length > i){
+    const cached = imgCache['p'+p.id+'_'+i];
+    if (cached && cached.length > 100) return cached;
+    if (p.images[i] && p.images[i].length > 100) return p.images[i];
+  }
+  if(i===0){
+    const cached = imgCache['p'+p.id];
+    if (cached && cached.length > 100) return cached;
+    if (p.image && p.image.length > 100) return p.image;
+  }
   return '';
+}
+function getImgCount(p){
+  if(p.images && p.images.length) return p.images.length;
+  if(imgCache['p'+p.id] || (p.image && p.image.length > 100)) return 1;
+  return 0;
 }
 // SVG icons (subset)
 function ic(n,sz){
@@ -243,9 +256,30 @@ initFirstDefaults();
 function openProduct(id) {
   const p = products.find(x=>x.id===id);
   const ep = effectivePrice(p);
-  const bigSrc = getImgSrc(p); const imgHtml = bigSrc
-    ? `<img src="${bigSrc}" alt="${p.name}" style="width:100%;height:200px;object-fit:contain;border-radius:12px;" onerror="this.remove()">`
-    : `<div style="font-size:5rem;text-align:center;padding:2rem;background:linear-gradient(135deg,var(--cream),rgba(74,15,27,0.1));border-radius:12px;">${catIcon(p.category)}</div>`;
+  const imgCount = getImgCount(p);
+  if(!window._galIdx) window._galIdx = {};
+  if(window._galIdx[id]===undefined) window._galIdx[id]=0;
+  function galHtml(){
+    const idx = window._galIdx[id]||0;
+    const src = getImgSrc(p, idx);
+    if(!src) return `<div style="font-size:5rem;text-align:center;padding:2rem;background:linear-gradient(135deg,var(--cream),rgba(74,15,27,0.1));border-radius:12px;">${catIcon(p.category)}</div>`;
+    let dots = '';
+    if(imgCount>1){
+      dots = '<div style="display:flex;justify-content:center;gap:6px;margin-top:8px;">';
+      for(let i=0;i<imgCount;i++){
+        dots += '<span style="width:8px;height:8px;border-radius:50%;background:'+(i===idx?'var(--bordeaux)':'var(--border)')+';cursor:pointer" onclick="window._galIdx['+id+']='+i+';openProduct('+id+')"></span>';
+      }
+      dots += '</div>';
+    }
+    return `<div style="position:relative">
+      <img src="${src}" alt="${p.name}" style="width:100%;height:200px;object-fit:contain;border-radius:12px;" onerror="this.remove()">
+      ${imgCount>1?`
+        <span onclick="window._galIdx[${id}]=(${idx}-1+${imgCount})%${imgCount};openProduct(${id})" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.8);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.15);">‹</span>
+        <span onclick="window._galIdx[${id}]=(${idx}+1)%${imgCount};openProduct(${id})" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.8);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.15);">›</span>
+      `:''}
+      ${dots}
+    </div>`;
+  }
   let colorHtml = '';
   if(p.colors && p.colors.length > 0){
     const items = p.colors.map((c,i)=>{
@@ -259,7 +293,7 @@ function openProduct(id) {
   openModal(`
     <button class="modal-close" onclick="closeModal()">✕</button>
     <h2>${p.name}</h2>
-    ${imgHtml}
+    ${galHtml()}
     <div style="margin:1rem 0 0.5rem;"><span style="font-size:0.65rem;color:var(--gold);letter-spacing:2px;font-weight:600;text-transform:uppercase;">${p.category}</span></div>
 <p style="color:var(--text-light);font-size:0.85rem;line-height:1.7;margin-bottom:0.8rem;">${p.description||'Bijou fantaisie en acier inoxydable haute qualité. Anti-allergie, résistant à l\'eau. Parfait pour un port quotidien.'}</p>
     ${colorHtml}
@@ -290,6 +324,7 @@ if(p.sizes && p.sizes.length > 0 && !selectedSizes[id]){
   const first = typeof p.sizes[0]==='object' ? p.sizes[0].name : p.sizes[0];
   selectedSizes[id] = first;
 }}
+function updateProductGallery(id){ openProduct(id); }
 function addToCartFromModal(id) { addToCart(id); closeModal(); }
 function selectSize(pid, size) {
   selectedSizes[pid] = size;
@@ -840,7 +875,7 @@ function showNotif(msg){
         products = data.products;
         try { localStorage.setItem('sytamProducts', JSON.stringify(products)); }
         catch(e) {
-          const local = products.map(x => ({ ...x, image: '' }));
+          const local = products.map(x => ({ ...x, image: '', images: [] }));
           localStorage.setItem('sytamProducts', JSON.stringify(local));
         }
       }
