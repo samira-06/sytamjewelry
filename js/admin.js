@@ -222,13 +222,13 @@ function initAdmin(){
   fbInit().then(async () => {
     if (isFirebaseReady()) {
       try {
+        // Sauvegarder les images AVANT la sync Supabase qui pourrait les effacer
+        var backupProds = G('sytamProducts');
         const data = await fbLoadAllData();
         if (data.products && data.products.length) {
-          // Préserver les images locales si Supabase n'en a pas
-          var localProds = G('sytamProducts');
           var merged = data.products.map(function(p){
-            var local = localProds ? localProds.find(function(x){ return x.id===p.id; }) : null;
-            if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length) && (!p.image||p.image.length<100)){
+            var local = backupProds ? backupProds.find(function(x){ return x.id===p.id; }) : null;
+            if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length)){
               p.images = local.images || [local.image];
               if(p.images.length) p.image = p.images[0];
             }
