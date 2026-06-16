@@ -228,7 +228,7 @@ function initAdmin(){
         if (data.products && data.products.length) {
           var merged = data.products.map(function(p){
             var local = backupProds ? backupProds.find(function(x){ return x.id===p.id; }) : null;
-            if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length)){
+            if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length || (local.images && local.images.length > p.images.length))){
               p.images = local.images || [local.image];
               if(p.images.length) p.image = p.images[0];
             }

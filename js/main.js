@@ -750,13 +750,12 @@ async function placeOrder(){
     }
     if (!usedAtomic) {
       // Fallback localStorage
-      const changedProds = [];
       order.items.forEach(item=>{
         const p = products.find(x=>x.id===item.id);
-        if(p){ p.stock=Math.max(0,p.stock-item.qty); p.sold+=item.qty; changedProds.push(p); }
+        if(p){ p.stock=Math.max(0,p.stock-item.qty); p.sold+=item.qty; }
       });
       localStorage.setItem('sytamProducts', JSON.stringify(products));
-      fbSaveProducts(changedProds).catch(e => {});
+      fbSaveProducts(products).catch(e => {});
     }
     orders.unshift(order);
     localStorage.setItem('sytamOrders', JSON.stringify(orders));
@@ -876,7 +875,7 @@ function showNotif(msg){
       if (data.products && data.products.length) {
         products = data.products.map(function(p){
           var local = backupProds ? backupProds.find(function(x){ return x.id===p.id; }) : null;
-          if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length)){
+          if(local && (local.images||(local.image&&local.image.length>100)) && (!p.images||!p.images.length || (local.images && local.images.length > p.images.length))){
             p.images = local.images || [local.image];
             if(p.images.length) p.image = p.images[0];
           }
