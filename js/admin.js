@@ -218,12 +218,12 @@ let loyaltyRule = G('sytam_loyaltyRule') || { threshold: 10 };
 function initAdmin(){
   document.getElementById('topDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('adminDate').textContent = 'Bienvenue — ' + new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  // Sauvegarder les images AVANT la sync Supabase qui pourrait les effacer
+  var backupProds = G('sytamProducts');
   // Try Firebase sync
   fbInit().then(async () => {
     if (isFirebaseReady()) {
       try {
-        // Sauvegarder les images AVANT la sync Supabase qui pourrait les effacer
-        var backupProds = G('sytamProducts');
         const data = await fbLoadAllData();
         if (data.products && data.products.length) {
           var merged = data.products.map(function(p){

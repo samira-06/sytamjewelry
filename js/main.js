@@ -864,14 +864,14 @@ function showNotif(msg){
 (async () => {
   try {
   await dbLoadAll();
+  // Sauvegarder les images AVANT la sync Supabase qui pourrait les effacer
+  var backupProds = G('sytamProducts');
   // Try Firebase sync
   const fbOk = await fbInit();
   // Preload ntfy topic in localStorage (for offline notification sending)
   if (fbOk) {
     try { await fbLoadNtfyTopic(); } catch(e) {}
     try {
-      // Sauvegarder les images AVANT la sync Supabase qui pourrait les effacer
-      var backupProds = G('sytamProducts');
       const data = await fbLoadAllData();
       if (data.products && data.products.length) {
         products = data.products.map(function(p){
