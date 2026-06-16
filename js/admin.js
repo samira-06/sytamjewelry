@@ -856,16 +856,19 @@ function saveImg(id){
   if(p.image && p.image.length > 100 && !p.images.includes(p.image)){
     p.images.unshift(p.image);
   }
-  p.images.push(url);
-  p.image = p.images[0];
   if(url.startsWith('data:')){
-    const idx = p.images.length-1;
-    dbSaveImg(id+'_'+idx, url).then(() => {
+    fbUploadImage(id, url).then(function(storageUrl){
+      p.images.push(storageUrl);
+      p.image = p.images[0];
       try { SET('sytamProducts', prods); } catch(e){ showToast('❌ Stockage plein',''); return; }
       fbSaveProducts(prods).catch(function(){});
       renderStockTable();closeModal();showToast('✓ Photo ajoutée','');
+    }).catch(function(e){
+      showToast('❌ Erreur upload: ' + (e.message||''));
     });
   } else {
+    p.images.push(url);
+    p.image = p.images[0];
     try { SET('sytamProducts', prods); } catch(e){ showToast('❌ Stockage plein',''); return; }
     fbSaveProducts(prods).catch(function(){});
     renderStockTable();closeModal();showToast('✓ Photo ajoutée','');
@@ -877,12 +880,13 @@ function delProductImg(id, idx){
   catch(e){ return; }
   const p=prods.find(x=>x.id===id);
   if(!p || !p.images) return;
+  var removedUrl = p.images[idx];
   p.images.splice(idx, 1);
   if(p.images.length) p.image = p.images[0];
   else { p.image = ''; delete p.images; }
   try { SET('sytamProducts', prods); } catch(e){}
   fbSaveProducts(prods).catch(function(){});
-  dbDelImg(id+'_'+idx).catch(function(){});
+  if (removedUrl && typeof fbDeleteImage === 'function') fbDeleteImage(removedUrl).catch(function(){});
   editImg(id);
 }
  

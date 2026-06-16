@@ -168,23 +168,29 @@ function fbGetNotifs() { return G('sytam_adminNotifs') || []; }
 function fbSaveNotifs(n) { SET('sytam_adminNotifs', n); }
 
 // ===== IMAGES =====
-async function fbUploadImage(pid, file) {
-  return new Promise(function(resolve, reject) {
-    var reader = new FileReader();
-    reader.onload = async function(e) {
-      var dataUrl = e.target.result;
-      try {
-        if (typeof dbOpen === 'function') {
-          var db = await dbOpen();
-          var tx = db.transaction('imgs', 'readwrite');
-          tx.objectStore('imgs').put({ id: 'p' + pid, data: dataUrl });
-        }
-        resolve(dataUrl);
-      } catch(e2) { reject(e2); }
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+async function fbUploadImage(pid, dataUrl) {
+  var res = await fetch(dataUrl);
+  var blob = await res.blob();
+  var ext = (blob.type || 'image/jpeg').split('/')[1] || 'jpg';
+  var fileName = 'product_' + pid + '_' + Date.now() + '.' + ext;
+  var formData = new FormData();
+  formData.append('file', blob, fileName);
+  var r = await fetch(SUPABASE_URL + '/storage/v1/object/sytam-images/' + fileName, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + SUPABASE_KEY },
+    body: formData,
   });
+  if (!r.ok) throw new Error('Supabase upload failed: ' + r.status);
+  return SUPABASE_URL + '/storage/v1/object/public/sytam-images/' + fileName;
+}
+async function fbDeleteImage(url) {
+  if (!url || !url.startsWith(SUPABASE_URL + '/storage/v1/object/public/sytam-images/')) return;
+  var path = url.replace(SUPABASE_URL + '/storage/v1/object/public/', '');
+  var r = await fetch(SUPABASE_URL + '/storage/v1/object/' + path, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + SUPABASE_KEY },
+  });
+  if (!r.ok) throw new Error('Supabase delete failed: ' + r.status);
 }
 
 // ===== LOAD ALL =====

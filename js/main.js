@@ -19,23 +19,24 @@ function dbLoadAll(){
     r.onerror = e => reject(e.target.error);
   })).catch(() => {});
 }
+function _validUrl(s){ return s && (s.startsWith('data:') || s.startsWith('http')); }
 function getImgSrc(p, idx){
   const i = idx || 0;
   if(p.images && p.images.length > i){
     const cached = imgCache['p'+p.id+'_'+i];
-    if (cached && cached.length > 100) return cached;
-    if (p.images[i] && p.images[i].length > 100) return p.images[i];
+    if (_validUrl(cached)) return cached;
+    if (_validUrl(p.images[i])) return p.images[i];
   }
   if(i===0){
     const cached = imgCache['p'+p.id];
-    if (cached && cached.length > 100) return cached;
-    if (p.image && p.image.length > 100) return p.image;
+    if (_validUrl(cached)) return cached;
+    if (_validUrl(p.image)) return p.image;
   }
   return '';
 }
 function getImgCount(p){
   if(p.images && p.images.length) return p.images.length;
-  if(imgCache['p'+p.id] || (p.image && p.image.length > 100)) return 1;
+  if(_validUrl(imgCache['p'+p.id]) || _validUrl(p.image)) return 1;
   return 0;
 }
 // SVG icons (subset)
